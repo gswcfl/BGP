@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+import time
+import MySQLdb
+	#	"10.10.7.130":["北京电信大郊亭163","扩展二套系统"],
+	#	"10.10.23.2":[""],
+	#	"10.10.23.130":[""],
+	#	"10.10.35.90":["北京铁通西客站","扩展一套系统"],
+	#	"10.10.128.20":[""],
+	#	"10.10.128.23":[""],
+	#	"10.10.131.26":[""],
+	#	"10.10.133.30":[""],
+	#	"10.10.217.2":[""],
+	#	"10.10.217.130":["",],
+	#	"10.10.213.2":["广州南方基地302","扩展一套系统"],
+	#	"10.10.213.130":["广州南方基地302","扩展二套系统"],
+	#	"10.10.215.2":["广州南方基地304","扩展一套系统"],
+	#	"10.10.215.130":["广州南方基地304","扩展二套系统"],
+	#	"10.10.96.20":[""],
+	#	"10.10.96.23":[""],
+	#	"10.10.149.2":["上海移动武胜","扩展一套系统"],
+	#	"10.10.149.130":["上海移动武胜","扩展二套系统"],
+	#	"10.10.145.2":["上海联通金桥三期","扩展一套系统"],
+	#	"10.10.145.130":["上海联通金桥三期","扩展二套系统"],
+	#"10.10.217.2":["广州联通东莞","扩展一套系统","TELNET","HUAWEI","adminjt","j0t0x5t","2k0s1k3g1","display bgp peer"],
+	#"10.10.217.130":["广州联通东莞","扩展二套系统","TELNET","H3C","adminjt","j0t0x5t","2k0s1k3g2","display bgp peer"],
+password_info = {
+	"10.10.15.130":["北京移动大白楼","扩展二套系统","TELNET","FiberHome","hsoft123","Banner@2015","null","show ip bgp summary"],
+	"10.10.15.2":["北京移动大白楼","扩展一套系统","TELNET","FiberHome","hsoft123","Banner@2015","null","show ip bgp summary"],
+	"10.10.21.130":["北京移动三台IP专网","扩展二套系统","TELNET","HUAWEI","hsoft","hsoft","null","display bgp peer"],
+	"10.10.21.2":["北京移动三台IP专网","扩展一套系统","TELNET","HUAWEI","hsoft","hsoft","null","display bgp peer"],
+	"10.10.35.50":["北京联通电报CNC","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.37.54":["北京联通电报CNC","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.17.2":["北京联通东古城","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.17.130":["北京联通东古城","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.11.2":["北京联通沙河","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.11.130":["北京联通沙河","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.35.18":["北京电信西单CN2","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.37.22":["北京电信西单CN2","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.7.2":["北京电信大郊亭163","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.37.94":["北京铁通西客站","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.29.2":["北京科技软件园","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.29.130":["北京科技软件园","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.27.2":["北京教育清华","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.27.130":["北京教育清华","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.131.34":["广州联通科学城169","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.133.38":["广州联通科技城169","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.131.50":["广州联通科学城CNC","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.133.54":["广州联通科学城CNC","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.131.2":["广州电信天河163","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.133.6":["广州电信天河163","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.131.10":["广州电信同和163","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.133.14":["广州电信同和163","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.131.18":["广州电信同和CN2","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.133.22":["广州电信同和CN2","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.131.66":["广州移动清河东","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.133.70":["广州移动清河东","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.131.90":["广州铁通东山","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.133.94":["广州铁通东山","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.99.26":["上海联通通联169","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.101.30":["上海联通通联169","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.99.50":["上海联通通联CNC","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.101.54":["上海联通通联CNC","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.99.34":["--上海联通金桥","扩展一套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.101.38":["--上海联通金桥","扩展二套系统","SSH","H3C","admin","admin","admin","display bgp peer"],
+	"10.10.99.2":["上海电信武胜163","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.101.6":["上海电信武胜163","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.99.10":["上海电信信息园163","扩展一套系统","TELNET","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.101.14":["上海电信信息园163","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.99.18":["上海电信民生CN2","扩展一套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.101.22":["上海电信民生CN2","扩展二套系统","SSH","HUAWEI","admin","admin","admin","display bgp peer"],
+	"10.10.147.2":["上海移动迎春路","扩展一套系统","TELNET","FiberHome","admin","admin","nll","show ip bgp summary"],
+	"10.10.147.130":["上海移动迎春路","扩展二套系统","TELNET","FiberHome","admin","admin","nll","show ip bgp summary"]
+	}
+db = MySQLdb.connect('10.52.249.100','bgp_user','111111','reuslt_info')
+cursor = db.cursor()
+for i in password_info:
+	sql = ('insert into bgp_info (ip_info,address_info,system_info,result,time_info) values ("%s","%s","%s","bgp_info","time_info");' %(i,password_info[i][0],password_info[i][1]))
+	#print sql
+	cursor.execute(sql)
+	db.commit()
+db.close()
